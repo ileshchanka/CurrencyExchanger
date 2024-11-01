@@ -1,9 +1,12 @@
 package info.igorek.currencyexchanger
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -66,7 +69,16 @@ fun MainScreen(
                     modifier = Modifier.padding(16.dp),
                 )
 
-                Text(text = mainUiState.rates.map { it.code }.toString()) // TODO REMOVE
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = mainUiState.balances.joinToString(separator = "   ") {
+                            "${it.balance} ${it.code}"
+                        }
+                    )
+                }
 
                 Text(
                     text = "Currency Exchange".uppercase(),

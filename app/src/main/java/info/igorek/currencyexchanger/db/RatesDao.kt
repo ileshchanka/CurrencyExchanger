@@ -10,8 +10,8 @@ interface RatesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertCurrenciesIfNeed(balanceList: List<CurrencyBalanceEntity>)
 
-    @Query("SELECT * FROM currency_balance")
-    fun getAll(): List<CurrencyBalanceEntity>
+    @Query("SELECT * FROM currency_balance ORDER BY balance DESC, code ASC")
+    fun getAllSorted(): List<CurrencyBalanceEntity>
 
     @Query("UPDATE currency_balance SET balance = balance - :amount WHERE code = :fromCode")
     fun decreaseBalance(fromCode: String, amount: Double)
