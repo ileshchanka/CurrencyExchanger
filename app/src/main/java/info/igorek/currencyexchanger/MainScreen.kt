@@ -9,7 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -17,6 +17,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import info.igorek.currencyexchanger.MainViewModel.MainUiState
+import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 
 @Composable
@@ -24,12 +27,19 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
+    val mainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        println("CurrencyExchangerApp() BEFORE viewModel.getCurrencies")
-        viewModel.getCurrencies()
-    }
+    MainScreen(
+        modifier = modifier,
+        mainUiState = mainUiState,
+    )
+}
 
+@Composable
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    mainUiState: MainUiState,
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -56,6 +66,8 @@ fun MainScreen(
                     modifier = Modifier.padding(16.dp),
                 )
 
+                Text(text = mainUiState.rates.map { it.code }.toString()) // TODO REMOVE
+
                 Text(
                     text = "Currency Exchange".uppercase(),
                     modifier = Modifier.padding(16.dp),
@@ -67,6 +79,14 @@ fun MainScreen(
 
 @Preview
 @Composable
-private fun Prev() {
-    MainScreen()
+private fun Preview() {
+    MainScreen(
+        mainUiState = MainUiState(
+            rates = listOf(
+                ExchangeRate("USD", 1.0),
+                ExchangeRate("EUR", 0.8),
+                ExchangeRate("GBP", 0.7),
+            )
+        )
+    )
 }
