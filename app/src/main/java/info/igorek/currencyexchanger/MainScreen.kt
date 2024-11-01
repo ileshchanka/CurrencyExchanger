@@ -9,16 +9,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 
 @Composable
-fun CurrencyExchangerApp(modifier: Modifier = Modifier) {
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel(),
+) {
+
+    LaunchedEffect(Unit) {
+        println("CurrencyExchangerApp() BEFORE viewModel.getCurrencies")
+        viewModel.getCurrencies()
+    }
 
     Scaffold(
         modifier = modifier,
@@ -58,5 +68,5 @@ fun CurrencyExchangerApp(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun Prev() {
-    CurrencyExchangerApp()
+    MainScreen()
 }
