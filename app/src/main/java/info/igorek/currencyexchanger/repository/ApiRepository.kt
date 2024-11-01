@@ -1,6 +1,8 @@
 package info.igorek.currencyexchanger.repository
 
+import info.igorek.currencyexchanger.db.RatesDao
 import info.igorek.currencyexchanger.mapper.ExchangeRateResponseToUiMapper
+import info.igorek.currencyexchanger.mapper.ExchangeRateToBalanceMapper
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.network.ApiService
 import javax.inject.Inject
@@ -12,17 +14,18 @@ interface ApiRepository {
 class ApiRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val exchangeRateResponseToUiMapper: ExchangeRateResponseToUiMapper,
-//    private val dao: RatesDao,
+    private val exchangeRateToBalanceMapper: ExchangeRateToBalanceMapper,
+    private val dao: RatesDao,
 ) : ApiRepository {
 
     override suspend fun getCurrencies(): List<ExchangeRate> {
 
-        return exchangeRateResponseToUiMapper.map(apiService.currencyExchangeRates())
+        val rates = exchangeRateResponseToUiMapper.map(apiService.currencyExchangeRates())
 
-//        val table = tableRemoteToUiMapper.map(
-//            apiService.currencyExchangeRates(),
-//        )
+        dao.insertCurrenciesIfNeed(
+            rates.map(exchangeRateToBalanceMapper::map)
+        )
 
-//        dao.insertAll(table.rates)
+        return rates
     }
 }
