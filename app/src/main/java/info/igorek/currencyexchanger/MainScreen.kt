@@ -90,6 +90,8 @@ fun MainScreen(
     onReceiveCurrencyChange: (CurrencyBalanceEntity) -> Unit,
 ) {
 
+    val isAmountExceedingBalance = (sellAmount.toDoubleOrNull() ?: 0.0) > sellCurrency.balance
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -159,7 +161,8 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .imePadding()
+                        .imePadding(),
+                    enabled = isAmountExceedingBalance.not(),
                 ) {
                     Text("Submit")
                 }

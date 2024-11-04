@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,15 @@ fun SellRow(
     onCurrencyChange: (CurrencyBalanceEntity) -> Unit,
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(amount)) }
+    var selectedCurrency by remember { mutableStateOf(currencyList.firstOrNull()) }
+
+    val isAmountExceedingBalance by remember {
+        derivedStateOf {
+            selectedCurrency?.let {
+                (textState.text.toDoubleOrNull() ?: 0.0) > it.balance
+            } ?: false
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -68,6 +78,7 @@ fun SellRow(
                 unfocusedContainerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
+                focusedTextColor = if (isAmountExceedingBalance) Color.Red else Color.Black,
             ),
             modifier = Modifier.width(150.dp), // TODO Find a better way to set width
         )
@@ -77,7 +88,10 @@ fun SellRow(
         Dropdown(
             modifier = Modifier,
             currencyList = currencyList,
-            onCurrencyChange = onCurrencyChange,
+            onCurrencyChange = {
+                selectedCurrency = it
+                onCurrencyChange(it)
+            },
         )
     }
 }
