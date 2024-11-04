@@ -2,11 +2,16 @@ package info.igorek.currencyexchanger
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -22,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import info.igorek.currencyexchanger.MainViewModel.MainUiState
+import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 
@@ -43,6 +49,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     mainUiState: MainUiState,
 ) {
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -63,27 +70,60 @@ fun MainScreen(
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
-            Column {
-                Text(
-                    text = "My Balances".uppercase(),
-                    modifier = Modifier.padding(16.dp),
-                )
-
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState())
-                ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
                     Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = mainUiState.balances.joinToString(separator = "   ") {
-                            "${it.balance} ${it.code}"
-                        }
+                        text = "My Balances".uppercase(),
+                        modifier = Modifier.padding(16.dp),
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = mainUiState.balances.joinToString(separator = "   ") {
+                                "${it.balance} ${it.code}"
+                            }
+                        )
+                    }
+
+                    Text(
+                        text = "Currency Exchange".uppercase(),
+                        modifier = Modifier.padding(16.dp),
+                    )
+
+                    SellRow(
+                        amount = "100.00",
+                        currencyList = mainUiState.balances,
+                    )
+
+                    HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+
+                    // Receive Section
+//                    SellRow(
+//                        icon = Icons.Default.KeyboardArrowDown,
+//                        iconColor = Color.Green,
+//                        title = "Receive",
+//                        amount = "+110.30",
+//                        currency = "USD",
+//                    )
                 }
 
-                Text(
-                    text = "Currency Exchange".uppercase(),
-                    modifier = Modifier.padding(16.dp),
-                )
+                Button(
+                    onClick = { /* Handle submit action */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .imePadding()
+                ) {
+                    Text("Submit")
+                }
             }
         }
     }
@@ -98,6 +138,11 @@ private fun Preview() {
                 ExchangeRate("USD", 1.0),
                 ExchangeRate("EUR", 0.8),
                 ExchangeRate("GBP", 0.7),
+            ),
+            balances = listOf(
+                CurrencyBalanceEntity("USD", 100.0),
+                CurrencyBalanceEntity("EUR", 200.0),
+                CurrencyBalanceEntity("GBP", 300.0),
             )
         )
     )
