@@ -18,6 +18,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +33,7 @@ import info.igorek.currencyexchanger.MainViewModel.MainUiState
 import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
+import java.util.Locale
 
 @Composable
 fun MainScreen(
@@ -38,9 +42,38 @@ fun MainScreen(
 ) {
     val mainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
 
+    var sellAmount by remember { mutableStateOf("100.00") }
+    var sellCurrency by remember {
+        mutableStateOf(
+            // TODO Find better way
+            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity(
+                "",
+                0.0
+            )
+        )
+    }
+    var receiveCurrency by remember {
+        mutableStateOf(
+            // TODO Find better way
+            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity(
+                "",
+                0.0
+            )
+        )
+    }
+
+    val receiveAmount = calculateReceiveAmount(sellAmount, sellCurrency, receiveCurrency, mainUiState.rates)
+
     MainScreen(
         modifier = modifier,
         mainUiState = mainUiState,
+        sellAmount = sellAmount,
+        sellCurrency = sellCurrency,
+        receiveAmount = receiveAmount,
+        receiveCurrency = receiveCurrency,
+        onSellAmountChange = { sellAmount = it },
+        onSellCurrencyChange = { sellCurrency = it },
+        onReceiveCurrencyChange = { receiveCurrency = it },
     )
 }
 
@@ -48,6 +81,13 @@ fun MainScreen(
 fun MainScreen(
     modifier: Modifier = Modifier,
     mainUiState: MainUiState,
+    sellAmount: String,
+    sellCurrency: CurrencyBalanceEntity,
+    receiveAmount: String,
+    receiveCurrency: CurrencyBalanceEntity,
+    onSellAmountChange: (String) -> Unit,
+    onSellCurrencyChange: (CurrencyBalanceEntity) -> Unit,
+    onReceiveCurrencyChange: (CurrencyBalanceEntity) -> Unit,
 ) {
 
     Scaffold(
@@ -99,20 +139,19 @@ fun MainScreen(
                     )
 
                     SellRow(
-                        amount = "100.00",
+                        amount = sellAmount,
                         currencyList = mainUiState.balances,
+                        onAmountChange = onSellAmountChange,
+                        onCurrencyChange = onSellCurrencyChange,
                     )
 
                     HorizontalDivider(color = Color.Gray, thickness = 1.dp)
 
-                    // Receive Section
-//                    SellRow(
-//                        icon = Icons.Default.KeyboardArrowDown,
-//                        iconColor = Color.Green,
-//                        title = "Receive",
-//                        amount = "+110.30",
-//                        currency = "USD",
-//                    )
+                    ReceiveRow(
+                        text = receiveAmount,
+                        currencyList = mainUiState.balances,
+                        onCurrencyChange = onReceiveCurrencyChange,
+                    )
                 }
 
                 Button(
@@ -127,6 +166,18 @@ fun MainScreen(
             }
         }
     }
+}
+
+fun calculateReceiveAmount(
+    sellAmount: String,
+    sellCurrency: CurrencyBalanceEntity,
+    receiveCurrency: CurrencyBalanceEntity,
+    rates: List<ExchangeRate>
+): String {
+    val sellRate = rates.find { it.code == sellCurrency.code }?.rate ?: 1.0
+    val receiveRate = rates.find { it.code == receiveCurrency.code }?.rate ?: 1.0
+    val amount = sellAmount.toDoubleOrNull() ?: 0.0
+    return String.format(Locale.ENGLISH, "%+.2f", amount * receiveRate / sellRate)
 }
 
 @Preview
@@ -144,6 +195,13 @@ private fun Preview() {
                 CurrencyBalanceEntity("EUR", 200.0),
                 CurrencyBalanceEntity("GBP", 300.0),
             )
-        )
+        ),
+        sellAmount = "100.00",
+        sellCurrency = CurrencyBalanceEntity("USD", 100.0),
+        receiveAmount = "80.00",
+        receiveCurrency = CurrencyBalanceEntity("EUR", 200.0),
+        onSellAmountChange = {},
+        onSellCurrencyChange = {},
+        onReceiveCurrencyChange = {},
     )
 }

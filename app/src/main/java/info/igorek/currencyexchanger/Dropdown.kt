@@ -25,6 +25,7 @@ import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 fun Dropdown(
     modifier: Modifier = Modifier,
     currencyList: List<CurrencyBalanceEntity>,
+    onCurrencyChange: (CurrencyBalanceEntity) -> Unit,
 ) {
     val isDropDownExpanded = remember { mutableStateOf(false) }
     val itemPosition = remember { mutableIntStateOf(0) }
@@ -66,6 +67,7 @@ fun Dropdown(
                             onClick = {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
+                                onCurrencyChange(currency)
                             }
                         )
                     }
@@ -85,6 +87,7 @@ private fun Preview() {
             CurrencyBalanceEntity("USD", 0.0),
             CurrencyBalanceEntity("EUR", 0.0),
             CurrencyBalanceEntity("GBP", 0.0),
-        )
+        ),
+        onCurrencyChange = {},
     )
 }
