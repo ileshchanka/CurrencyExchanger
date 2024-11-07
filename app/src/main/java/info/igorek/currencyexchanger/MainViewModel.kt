@@ -52,4 +52,11 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun updateBalances(fromCode: String, toCode: String, sellAmount: Double, receiveAmount: Double, onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = databaseRepository.updateBalances(fromCode, toCode, sellAmount, receiveAmount)
+            onComplete(result)
+        }
+    }
 }

@@ -13,9 +13,13 @@ interface RatesDao {
     @Query("SELECT * FROM currency_balance ORDER BY balance DESC, code ASC")
     fun getAllSorted(): List<CurrencyBalanceEntity>
 
-    @Query("UPDATE currency_balance SET balance = balance - :amount WHERE code = :fromCode")
-    fun decreaseBalance(fromCode: String, amount: Double)
-
-    @Query("UPDATE currency_balance SET balance = balance + :amount WHERE code = :toCode")
-    fun increaseBalance(toCode: String, amount: Double)
+    @Query(
+        """UPDATE currency_balance
+    SET balance = CASE
+        WHEN code = :fromCode THEN balance - :sellAmount
+        WHEN code = :toCode THEN balance + :receiveAmount
+    END
+    WHERE code IN (:fromCode, :toCode)"""
+    )
+    fun updateBalances(fromCode: String, toCode: String, sellAmount: Double, receiveAmount: Double): Int
 }

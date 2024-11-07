@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +75,15 @@ fun MainScreen(
         onSellAmountChange = { sellAmount = it },
         onSellCurrencyChange = { sellCurrency = it },
         onReceiveCurrencyChange = { receiveCurrency = it },
+        onSubmit = { onComplete ->
+            viewModel.updateBalances(
+                fromCode = sellCurrency.code,
+                toCode = receiveCurrency.code,
+                sellAmount = sellAmount.toDouble(),
+                receiveAmount = receiveAmount.toDouble(),
+                onComplete = onComplete,
+            )
+        },
     )
 }
 
@@ -88,9 +98,11 @@ fun MainScreen(
     onSellAmountChange: (String) -> Unit,
     onSellCurrencyChange: (CurrencyBalanceEntity) -> Unit,
     onReceiveCurrencyChange: (CurrencyBalanceEntity) -> Unit,
+    onSubmit: ((Boolean) -> Unit) -> Unit,
 ) {
 
     val isAmountExceedingBalance = (sellAmount.toDoubleOrNull() ?: 0.0) > sellCurrency.balance
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -157,7 +169,15 @@ fun MainScreen(
                 }
 
                 Button(
-                    onClick = { /* Handle submit action */ },
+                    onClick = {
+                        onSubmit(
+                            { success ->
+                                if (success) {
+                                    showDialog = true
+                                }
+                            }
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -168,6 +188,20 @@ fun MainScreen(
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Done")
+                }
+            },
+            text = {
+                Text("You have converted $sellAmount ${sellCurrency.code} to $receiveAmount ${receiveCurrency.code}")
+            }
+        )
     }
 }
 
@@ -206,5 +240,6 @@ private fun Preview() {
         onSellAmountChange = {},
         onSellCurrencyChange = {},
         onReceiveCurrencyChange = {},
+        onSubmit = {},
     )
 }
