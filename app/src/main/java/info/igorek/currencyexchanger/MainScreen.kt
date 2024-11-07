@@ -63,7 +63,9 @@ fun MainScreen(
         )
     }
 
-    val receiveAmount = calculateReceiveAmount(sellAmount, sellCurrency, receiveCurrency, mainUiState.rates)
+    val exchangeCount = viewModel.getExchangeCount()
+    val receiveAmount =
+        calculateReceiveAmount(sellAmount, sellCurrency, receiveCurrency, mainUiState.rates, exchangeCount)
 
     MainScreen(
         modifier = modifier,
@@ -76,14 +78,16 @@ fun MainScreen(
         onSellCurrencyChange = { sellCurrency = it },
         onReceiveCurrencyChange = { receiveCurrency = it },
         onSubmit = { onComplete ->
+            val commission = if (exchangeCount >= 5) sellAmount.toDouble() * COMMISSION_PERCENT else 0.0
             viewModel.updateBalances(
                 fromCode = sellCurrency.code,
                 toCode = receiveCurrency.code,
-                sellAmount = sellAmount.toDouble(),
+                sellAmount = sellAmount.toDouble() + commission,
                 receiveAmount = receiveAmount.toDouble(),
                 onComplete = onComplete,
             )
         },
+        exchangeCount = exchangeCount,
     )
 }
 
@@ -99,6 +103,7 @@ fun MainScreen(
     onSellCurrencyChange: (CurrencyBalanceEntity) -> Unit,
     onReceiveCurrencyChange: (CurrencyBalanceEntity) -> Unit,
     onSubmit: ((Boolean) -> Unit) -> Unit,
+    exchangeCount: Int,
 ) {
 
     val isAmountExceedingBalance = (sellAmount.toDoubleOrNull() ?: 0.0) > sellCurrency.balance
@@ -199,7 +204,15 @@ fun MainScreen(
                 }
             },
             text = {
-                Text("You have converted $sellAmount ${sellCurrency.code} to $receiveAmount ${receiveCurrency.code}")
+                val commissionAmount = sellAmount.toDoubleOrNull()?.times(0.007) ?: 0.0
+                val commissionText = if (exchangeCount >= 5) ". Commission Fee - ${
+                    String.format(
+                        Locale.ENGLISH,
+                        "%.2f",
+                        commissionAmount
+                    )
+                } ${sellCurrency.code}." else ""
+                Text("You have converted $sellAmount ${sellCurrency.code} to $receiveAmount ${receiveCurrency.code}$commissionText")
             }
         )
     }
@@ -209,12 +222,15 @@ fun calculateReceiveAmount(
     sellAmount: String,
     sellCurrency: CurrencyBalanceEntity,
     receiveCurrency: CurrencyBalanceEntity,
-    rates: List<ExchangeRate>
+    rates: List<ExchangeRate>,
+    exchangeCount: Int,
 ): String {
     val sellRate = rates.find { it.code == sellCurrency.code }?.rate ?: 1.0
     val receiveRate = rates.find { it.code == receiveCurrency.code }?.rate ?: 1.0
     val amount = sellAmount.toDoubleOrNull() ?: 0.0
-    return String.format(Locale.ENGLISH, "%+.2f", amount * receiveRate / sellRate)
+    val commission = if (exchangeCount >= 5) COMMISSION_PERCENT else 0.0
+    val amountAfterCommission = amount * (1 - commission)
+    return String.format(Locale.ENGLISH, "%+.2f", amountAfterCommission * receiveRate / sellRate)
 }
 
 @Preview
@@ -241,5 +257,6 @@ private fun Preview() {
         onSellCurrencyChange = {},
         onReceiveCurrencyChange = {},
         onSubmit = {},
+        exchangeCount = 0,
     )
 }

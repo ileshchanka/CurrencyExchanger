@@ -1,5 +1,6 @@
 package info.igorek.currencyexchanger
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,6 +8,7 @@ import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.repository.ApiRepository
 import info.igorek.currencyexchanger.repository.DatabaseRepository
+import info.igorek.currencyexchanger.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val apiRepository: ApiRepository,
     private val databaseRepository: DatabaseRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
 
     private val _mainUiState = MutableStateFlow(MainUiState())
@@ -53,10 +56,24 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun updateBalances(fromCode: String, toCode: String, sellAmount: Double, receiveAmount: Double, onComplete: (Boolean) -> Unit) {
+    fun updateBalances(
+        fromCode: String,
+        toCode: String,
+        sellAmount: Double,
+        receiveAmount: Double,
+        onComplete: (Boolean) -> Unit
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = databaseRepository.updateBalances(fromCode, toCode, sellAmount, receiveAmount)
+            if (result) with(preferencesRepository) {
+                saveExchangeCount(exchangeCount + 1)
+                Log.d("IH@R", "updateBalances: exchangeCount = $exchangeCount")
+            }
             onComplete(result)
         }
+    }
+
+    fun getExchangeCount(): Int {
+        return preferencesRepository.exchangeCount
     }
 }

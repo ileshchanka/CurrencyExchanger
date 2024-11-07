@@ -76,4 +76,7 @@ dependencies {
     /** Retrofit */
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    /** Encrypted Shared Preferences */
+    implementation(libs.security.crypto)
 }
