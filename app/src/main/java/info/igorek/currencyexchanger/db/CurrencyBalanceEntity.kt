@@ -7,4 +7,8 @@ import androidx.room.PrimaryKey
 data class CurrencyBalanceEntity(
     @PrimaryKey val code: String,
     val balance: Double,
-)
+) {
+    companion object {
+        fun empty() = CurrencyBalanceEntity("", 0.0)
+    }
+}

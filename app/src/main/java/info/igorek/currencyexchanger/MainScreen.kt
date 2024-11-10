@@ -1,5 +1,6 @@
 package info.igorek.currencyexchanger
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +39,7 @@ import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun MainScreen(
@@ -43,42 +48,60 @@ fun MainScreen(
 ) {
     val mainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-    var sellAmount by remember { mutableStateOf("100.00") }
+    var sellAmount by remember { mutableStateOf(100.00.toString()) }
+    var commission by remember { mutableDoubleStateOf(0.0) }
+
     var sellCurrency by remember {
         mutableStateOf(
-            // TODO Find better way
-            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity(
-                "",
-                0.0
-            )
+            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty()
         )
     }
     var receiveCurrency by remember {
         mutableStateOf(
-            // TODO Find better way
-            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity(
-                "",
-                0.0
-            )
+            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty()
         )
     }
 
+    LaunchedEffect(mainUiState.balances) {
+        if (mainUiState.balances.isNotEmpty()) {
+            sellCurrency = mainUiState.balances.first()
+            receiveCurrency = mainUiState.balances.first()
+        }
+    }
+
+
     val exchangeCount = viewModel.getExchangeCount()
+
+    val hasCommission by remember { derivedStateOf { exchangeCount >= 5 } }
+
     val receiveAmount =
-        calculateReceiveAmount(sellAmount, sellCurrency, receiveCurrency, mainUiState.rates, exchangeCount)
+        calculateReceiveAmount(sellAmount, sellCurrency, receiveCurrency, mainUiState.rates, hasCommission)
+
+    val isAmountEnoughBalance by remember {
+        derivedStateOf {
+            val amount = sellAmount.toDoubleOrNull() ?: 0.0
+            val amountWithCommission = if (hasCommission) amount + commission else amount
+            amountWithCommission <= sellCurrency.balance
+        }
+    }
+
+    val isCurrenciesDifferent by remember { derivedStateOf { sellCurrency.code != receiveCurrency.code } }
 
     MainScreen(
         modifier = modifier,
         mainUiState = mainUiState,
         sellAmount = sellAmount,
+        commission = commission,
         sellCurrency = sellCurrency,
         receiveAmount = receiveAmount,
         receiveCurrency = receiveCurrency,
-        onSellAmountChange = { sellAmount = it },
+        onSellAmountChange = {
+            sellAmount = it
+            commission = ((it.toDouble() * 0.007) * 100).roundToInt() / 100.0
+        },
         onSellCurrencyChange = { sellCurrency = it },
         onReceiveCurrencyChange = { receiveCurrency = it },
         onSubmit = { onComplete ->
-            val commission = if (exchangeCount >= 5) sellAmount.toDouble() * COMMISSION_PERCENT else 0.0
             viewModel.updateBalances(
                 fromCode = sellCurrency.code,
                 toCode = receiveCurrency.code,
@@ -87,7 +110,9 @@ fun MainScreen(
                 onComplete = onComplete,
             )
         },
-        exchangeCount = exchangeCount,
+        hasCommission = hasCommission,
+        isSubmitButtonEnabled = isAmountEnoughBalance && isCurrenciesDifferent,
+        isAmountEnoughBalance = isAmountEnoughBalance,
     )
 }
 
@@ -96,6 +121,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     mainUiState: MainUiState,
     sellAmount: String,
+    commission: Double,
     sellCurrency: CurrencyBalanceEntity,
     receiveAmount: String,
     receiveCurrency: CurrencyBalanceEntity,
@@ -103,10 +129,11 @@ fun MainScreen(
     onSellCurrencyChange: (CurrencyBalanceEntity) -> Unit,
     onReceiveCurrencyChange: (CurrencyBalanceEntity) -> Unit,
     onSubmit: ((Boolean) -> Unit) -> Unit,
-    exchangeCount: Int,
+    hasCommission: Boolean,
+    isSubmitButtonEnabled: Boolean,
+    isAmountEnoughBalance: Boolean,
 ) {
 
-    val isAmountExceedingBalance = (sellAmount.toDoubleOrNull() ?: 0.0) > sellCurrency.balance
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -159,9 +186,12 @@ fun MainScreen(
 
                     SellRow(
                         amount = sellAmount,
+                        commission = commission,
                         currencyList = mainUiState.balances,
                         onAmountChange = onSellAmountChange,
                         onCurrencyChange = onSellCurrencyChange,
+                        hasCommission = hasCommission,
+                        isAmountEnoughBalance = isAmountEnoughBalance,
                     )
 
                     HorizontalDivider(color = Color.Gray, thickness = 1.dp)
@@ -171,6 +201,8 @@ fun MainScreen(
                         currencyList = mainUiState.balances,
                         onCurrencyChange = onReceiveCurrencyChange,
                     )
+
+                    Log.d("IH@R", "MainScreen: $sellAmount $sellCurrency $receiveAmount $receiveCurrency")
                 }
 
                 Button(
@@ -187,7 +219,7 @@ fun MainScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .imePadding(),
-                    enabled = isAmountExceedingBalance.not(),
+                    enabled = isSubmitButtonEnabled,
                 ) {
                     Text("Submit")
                 }
@@ -205,7 +237,7 @@ fun MainScreen(
             },
             text = {
                 val commissionAmount = sellAmount.toDoubleOrNull()?.times(0.007) ?: 0.0
-                val commissionText = if (exchangeCount >= 5) ". Commission Fee - ${
+                val commissionText = if (hasCommission) ". Commission Fee - ${
                     String.format(
                         Locale.ENGLISH,
                         "%.2f",
@@ -223,12 +255,12 @@ fun calculateReceiveAmount(
     sellCurrency: CurrencyBalanceEntity,
     receiveCurrency: CurrencyBalanceEntity,
     rates: List<ExchangeRate>,
-    exchangeCount: Int,
+    hasCommission: Boolean,
 ): String {
     val sellRate = rates.find { it.code == sellCurrency.code }?.rate ?: 1.0
     val receiveRate = rates.find { it.code == receiveCurrency.code }?.rate ?: 1.0
     val amount = sellAmount.toDoubleOrNull() ?: 0.0
-    val commission = if (exchangeCount >= 5) COMMISSION_PERCENT else 0.0
+    val commission = if (hasCommission) COMMISSION_PERCENT else 0.0
     val amountAfterCommission = amount * (1 - commission)
     return String.format(Locale.ENGLISH, "%+.2f", amountAfterCommission * receiveRate / sellRate)
 }
@@ -250,6 +282,7 @@ private fun Preview() {
             )
         ),
         sellAmount = "100.00",
+        commission = 0.7,
         sellCurrency = CurrencyBalanceEntity("USD", 100.0),
         receiveAmount = "80.00",
         receiveCurrency = CurrencyBalanceEntity("EUR", 200.0),
@@ -257,6 +290,8 @@ private fun Preview() {
         onSellCurrencyChange = {},
         onReceiveCurrencyChange = {},
         onSubmit = {},
-        exchangeCount = 0,
+        hasCommission = true,
+        isSubmitButtonEnabled = true,
+        isAmountEnoughBalance = true,
     )
 }
