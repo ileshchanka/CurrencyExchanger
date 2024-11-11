@@ -1,6 +1,5 @@
 package info.igorek.currencyexchanger
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +38,6 @@ import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 import info.igorek.currencyexchanger.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 import java.util.Locale
-import kotlin.math.roundToInt
 
 @Composable
 fun MainScreen(
@@ -48,18 +46,15 @@ fun MainScreen(
 ) {
     val mainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
 
-    var sellAmount by remember { mutableStateOf(100.00.toString()) }
-    var commission by remember { mutableDoubleStateOf(0.0) }
+    var sellAmount by remember { mutableDoubleStateOf(100.00) }
+    var commission by remember { mutableDoubleStateOf((sellAmount * COMMISSION_PERCENT).roundToDecimals(2)) }
 
     var sellCurrency by remember {
-        mutableStateOf(
-            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty()
-        )
+        mutableStateOf(mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty())
     }
+
     var receiveCurrency by remember {
-        mutableStateOf(
-            mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty()
-        )
+        mutableStateOf(mainUiState.balances.firstOrNull() ?: CurrencyBalanceEntity.empty())
     }
 
     LaunchedEffect(mainUiState.balances) {
@@ -79,13 +74,14 @@ fun MainScreen(
 
     val isAmountEnoughBalance by remember {
         derivedStateOf {
-            val amount = sellAmount.toDoubleOrNull() ?: 0.0
-            val amountWithCommission = if (hasCommission) amount + commission else amount
+            val amountWithCommission = if (hasCommission) sellAmount + commission else sellAmount
             amountWithCommission <= sellCurrency.balance
         }
     }
 
     val isCurrenciesDifferent by remember { derivedStateOf { sellCurrency.code != receiveCurrency.code } }
+
+    val isAmountNotEmpty by remember { derivedStateOf { sellAmount > 0.0 } }
 
     MainScreen(
         modifier = modifier,
@@ -96,8 +92,8 @@ fun MainScreen(
         receiveAmount = receiveAmount,
         receiveCurrency = receiveCurrency,
         onSellAmountChange = {
-            sellAmount = it
-            commission = ((it.toDouble() * 0.007) * 100).roundToInt() / 100.0
+            sellAmount = if (it.isNotEmpty()) it.toDouble() else 0.0
+            commission = if (it.isNotEmpty()) (it.toDouble() * COMMISSION_PERCENT).roundToDecimals(2) else 0.0
         },
         onSellCurrencyChange = { sellCurrency = it },
         onReceiveCurrencyChange = { receiveCurrency = it },
@@ -105,13 +101,13 @@ fun MainScreen(
             viewModel.updateBalances(
                 fromCode = sellCurrency.code,
                 toCode = receiveCurrency.code,
-                sellAmount = sellAmount.toDouble() + commission,
+                sellAmount = sellAmount + commission,
                 receiveAmount = receiveAmount.toDouble(),
                 onComplete = onComplete,
             )
         },
         hasCommission = hasCommission,
-        isSubmitButtonEnabled = isAmountEnoughBalance && isCurrenciesDifferent,
+        isSubmitButtonEnabled = isAmountEnoughBalance && isCurrenciesDifferent && isAmountNotEmpty,
         isAmountEnoughBalance = isAmountEnoughBalance,
     )
 }
@@ -120,7 +116,7 @@ fun MainScreen(
 fun MainScreen(
     modifier: Modifier = Modifier,
     mainUiState: MainUiState,
-    sellAmount: String,
+    sellAmount: Double,
     commission: Double,
     sellCurrency: CurrencyBalanceEntity,
     receiveAmount: String,
@@ -185,8 +181,9 @@ fun MainScreen(
                     )
 
                     SellRow(
-                        amount = sellAmount,
+                        amount = sellAmount.toString(),
                         commission = commission,
+                        currencyCode = sellCurrency.code,
                         currencyList = mainUiState.balances,
                         onAmountChange = onSellAmountChange,
                         onCurrencyChange = onSellCurrencyChange,
@@ -201,8 +198,6 @@ fun MainScreen(
                         currencyList = mainUiState.balances,
                         onCurrencyChange = onReceiveCurrencyChange,
                     )
-
-                    Log.d("IH@R", "MainScreen: $sellAmount $sellCurrency $receiveAmount $receiveCurrency")
                 }
 
                 Button(
@@ -236,14 +231,7 @@ fun MainScreen(
                 }
             },
             text = {
-                val commissionAmount = sellAmount.toDoubleOrNull()?.times(0.007) ?: 0.0
-                val commissionText = if (hasCommission) ". Commission Fee - ${
-                    String.format(
-                        Locale.ENGLISH,
-                        "%.2f",
-                        commissionAmount
-                    )
-                } ${sellCurrency.code}." else ""
+                val commissionText = if (hasCommission) ". Commission Fee - $commission ${sellCurrency.code}." else ""
                 Text("You have converted $sellAmount ${sellCurrency.code} to $receiveAmount ${receiveCurrency.code}$commissionText")
             }
         )
@@ -251,7 +239,7 @@ fun MainScreen(
 }
 
 fun calculateReceiveAmount(
-    sellAmount: String,
+    sellAmount: Double,
     sellCurrency: CurrencyBalanceEntity,
     receiveCurrency: CurrencyBalanceEntity,
     rates: List<ExchangeRate>,
@@ -259,9 +247,8 @@ fun calculateReceiveAmount(
 ): String {
     val sellRate = rates.find { it.code == sellCurrency.code }?.rate ?: 1.0
     val receiveRate = rates.find { it.code == receiveCurrency.code }?.rate ?: 1.0
-    val amount = sellAmount.toDoubleOrNull() ?: 0.0
     val commission = if (hasCommission) COMMISSION_PERCENT else 0.0
-    val amountAfterCommission = amount * (1 - commission)
+    val amountAfterCommission = sellAmount * (1 - commission)
     return String.format(Locale.ENGLISH, "%+.2f", amountAfterCommission * receiveRate / sellRate)
 }
 
@@ -281,7 +268,7 @@ private fun Preview() {
                 CurrencyBalanceEntity("GBP", 300.0),
             )
         ),
-        sellAmount = "100.00",
+        sellAmount = 100.00,
         commission = 0.7,
         sellCurrency = CurrencyBalanceEntity("USD", 100.0),
         receiveAmount = "80.00",

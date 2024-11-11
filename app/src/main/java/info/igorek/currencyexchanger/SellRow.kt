@@ -32,6 +32,7 @@ import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
 fun SellRow(
     amount: String,
     commission: Double,
+    currencyCode: String,
     currencyList: List<CurrencyBalanceEntity>,
     onAmountChange: (String) -> Unit,
     onCurrencyChange: (CurrencyBalanceEntity) -> Unit,
@@ -39,7 +40,6 @@ fun SellRow(
     isAmountEnoughBalance: Boolean,
 ) {
     var textState by remember { mutableStateOf(TextFieldValue(amount)) }
-    var selectedCurrency by remember { mutableStateOf(currencyList.firstOrNull()) }
 
     Column {
         Row(
@@ -85,7 +85,6 @@ fun SellRow(
                 modifier = Modifier,
                 currencyList = currencyList,
                 onCurrencyChange = {
-                    selectedCurrency = it
                     onCurrencyChange(it)
                 },
             )
@@ -94,11 +93,7 @@ fun SellRow(
         Row {
             if (hasCommission) {
                 Text(
-                    text = "Commission: ",
-                    color = Color.Red,
-                )
-                Text(
-                    text = commission.toString(),
+                    text = "Commission: $commission $currencyCode",
                     color = Color.Red,
                 )
             }
@@ -112,6 +107,7 @@ private fun Preview() {
     SellRow(
         amount = "100.00",
         commission = 0.7,
+        currencyCode = "USD",
         currencyList = listOf(
             CurrencyBalanceEntity("USD", 100.0),
             CurrencyBalanceEntity("EUR", 200.0),
