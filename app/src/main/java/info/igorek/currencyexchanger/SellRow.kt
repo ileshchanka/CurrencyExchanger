@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +60,7 @@ fun SellRow(
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Sell",
+                text = stringResource(R.string.sell),
             )
 
             TextField(
@@ -76,7 +78,9 @@ fun SellRow(
                     unfocusedIndicatorColor = Color.Transparent,
                     focusedTextColor = if (isAmountEnoughBalance) Color.Black else Color.Red,
                 ),
-                modifier = Modifier.width(150.dp), // TODO Find a better way to set width
+                modifier = Modifier
+                    .padding(0.dp)
+                    .width(150.dp), // TODO Find a better way to set width
             )
 
             Spacer(modifier = Modifier.width(4.dp))
@@ -93,7 +97,7 @@ fun SellRow(
         Row {
             if (hasCommission) {
                 Text(
-                    text = "Commission: $commission $currencyCode",
+                    text = stringResource(R.string.commission, commission, currencyCode),
                     color = Color.Red,
                 )
             }

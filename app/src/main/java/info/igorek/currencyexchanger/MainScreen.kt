@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -136,7 +137,7 @@ fun MainScreen(
         modifier = modifier,
         topBar = {
             Text(
-                text = "Currency converter",
+                text = stringResource(R.string.currency_converter),
                 style = MaterialTheme.typography.headlineSmall,
                 maxLines = 1,
                 textAlign = TextAlign.Center,
@@ -158,7 +159,7 @@ fun MainScreen(
             ) {
                 Column {
                     Text(
-                        text = "My Balances".uppercase(),
+                        text = stringResource(R.string.my_balances),
                         modifier = Modifier.padding(16.dp),
                     )
 
@@ -169,14 +170,14 @@ fun MainScreen(
                     ) {
                         Text(
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            text = mainUiState.balances.joinToString(separator = "   ") {
+                            text = mainUiState.balances.joinToString(separator = BALANCE_SEPARATOR) {
                                 "${it.balance} ${it.code}"
                             }
                         )
                     }
 
                     Text(
-                        text = "Currency Exchange".uppercase(),
+                        text = stringResource(R.string.currency_exchange),
                         modifier = Modifier.padding(16.dp),
                     )
 
@@ -202,13 +203,7 @@ fun MainScreen(
 
                 Button(
                     onClick = {
-                        onSubmit(
-                            { success ->
-                                if (success) {
-                                    showDialog = true
-                                }
-                            }
-                        )
+                        onSubmit({ success -> if (success) showDialog = true })
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -216,7 +211,9 @@ fun MainScreen(
                         .imePadding(),
                     enabled = isSubmitButtonEnabled,
                 ) {
-                    Text("Submit")
+                    Text(
+                        text = stringResource(R.string.submit),
+                    )
                 }
             }
         }
@@ -227,12 +224,26 @@ fun MainScreen(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 Button(onClick = { showDialog = false }) {
-                    Text("Done")
+                    Text(
+                        text = stringResource(R.string.done),
+                    )
                 }
             },
             text = {
-                val commissionText = if (hasCommission) ". Commission Fee - $commission ${sellCurrency.code}." else ""
-                Text("You have converted $sellAmount ${sellCurrency.code} to $receiveAmount ${receiveCurrency.code}$commissionText")
+                Text(
+                    text = stringResource(
+                        R.string.you_have_converted_to,
+                        sellAmount,
+                        sellCurrency.code,
+                        receiveAmount,
+                        receiveCurrency.code,
+                        if (hasCommission) stringResource(
+                            R.string.commission_fee,
+                            commission,
+                            sellCurrency.code
+                        ) else EMPTY_STRING,
+                    )
+                )
             }
         )
     }

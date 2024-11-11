@@ -1,6 +1,5 @@
 package info.igorek.currencyexchanger
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,7 +66,6 @@ class MainViewModel @Inject constructor(
             val result = databaseRepository.updateBalances(fromCode, toCode, sellAmount, receiveAmount)
             if (result) with(preferencesRepository) {
                 saveExchangeCount(exchangeCount + 1)
-                Log.d("IH@R", "updateBalances: exchangeCount = $exchangeCount")
             }
             onComplete(result)
         }

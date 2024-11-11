@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Currency Exchanger</string>
+
+    <string name="currency_converter">Currency converter</string>
+    <string name="my_balances">MY BALANCES</string>
+    <string name="currency_exchange">CURRENCY EXCHANGE</string>
+    <string name="dropdown_bo_currencies">No currencies available</string>
+    <string name="submit">Submit</string>
+    <string name="done">Done</string>
+    <string name="you_have_converted_to">You have converted %1$s %2$s to %3$s %4$s%5$s</string>
+    <string name="commission_fee">. Commission Fee - %1$s %2$s.</string>
+    <string name="receive">Receive</string>
+    <string name="sell">Sell</string>
+    <string name="commission">Commission: %1$s %2$s</string>
 </resources>

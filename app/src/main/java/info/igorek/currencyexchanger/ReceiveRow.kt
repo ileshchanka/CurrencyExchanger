@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
@@ -41,7 +42,7 @@ fun ReceiveRow(
 
         Text(
             modifier = Modifier.weight(1f),
-            text = "Receive",
+            text = stringResource(R.string.receive),
         )
 
         Text(
@@ -70,6 +71,6 @@ private fun Preview() {
             CurrencyBalanceEntity("EUR", 200.0),
             CurrencyBalanceEntity("GBP", 300.0),
         ),
-        onCurrencyChange = { },
+        onCurrencyChange = {},
     )
 }

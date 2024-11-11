@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
@@ -47,7 +48,7 @@ fun Dropdown(
                     Text(text = currencyList[itemPosition.intValue].code)
                     Image(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "DropDown Icon"
+                        contentDescription = null,
                     )
                 }
 
@@ -75,7 +76,7 @@ fun Dropdown(
             }
         }
     } else {
-        Text(text = "No currencies available")
+        Text(text = stringResource(R.string.dropdown_bo_currencies))
     }
 }
 
