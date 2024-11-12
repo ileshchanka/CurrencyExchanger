@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger.model
+package info.igorek.currencyexchanger.domain.model
 
 data class ExchangeRate(
     val code: String,

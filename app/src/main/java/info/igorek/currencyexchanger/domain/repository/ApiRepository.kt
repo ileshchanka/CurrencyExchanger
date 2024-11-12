@@ -1,10 +1,10 @@
-package info.igorek.currencyexchanger.repository
+package info.igorek.currencyexchanger.domain.repository
 
-import info.igorek.currencyexchanger.db.RatesDao
-import info.igorek.currencyexchanger.mapper.ExchangeRateResponseToUiMapper
-import info.igorek.currencyexchanger.mapper.ExchangeRateToBalanceMapper
-import info.igorek.currencyexchanger.model.ExchangeRate
-import info.igorek.currencyexchanger.network.ApiService
+import info.igorek.currencyexchanger.data.db.RatesDao
+import info.igorek.currencyexchanger.domain.mapper.ExchangeRateResponseToUiMapper
+import info.igorek.currencyexchanger.domain.mapper.ExchangeRateToBalanceMapper
+import info.igorek.currencyexchanger.domain.model.ExchangeRate
+import info.igorek.currencyexchanger.data.network.ApiService
 import javax.inject.Inject
 
 interface ApiRepository {

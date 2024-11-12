@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import dagger.hilt.android.AndroidEntryPoint
+import info.igorek.currencyexchanger.ui.MainScreen
 import info.igorek.currencyexchanger.ui.theme.CurrencyExchangerTheme
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
 

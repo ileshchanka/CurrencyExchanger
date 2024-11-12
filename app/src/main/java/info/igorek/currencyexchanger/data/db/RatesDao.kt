@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger.db
+package info.igorek.currencyexchanger.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert

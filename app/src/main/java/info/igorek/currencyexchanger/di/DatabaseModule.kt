@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import info.igorek.currencyexchanger.db.AppDatabase
+import info.igorek.currencyexchanger.data.db.AppDatabase
 import javax.inject.Singleton
 
 @Module

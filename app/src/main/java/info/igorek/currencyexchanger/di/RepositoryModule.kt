@@ -4,12 +4,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import info.igorek.currencyexchanger.repository.ApiRepository
-import info.igorek.currencyexchanger.repository.ApiRepositoryImpl
-import info.igorek.currencyexchanger.repository.DatabaseRepository
-import info.igorek.currencyexchanger.repository.DatabaseRepositoryImpl
-import info.igorek.currencyexchanger.repository.PreferencesRepository
-import info.igorek.currencyexchanger.repository.PreferencesRepositoryImpl
+import info.igorek.currencyexchanger.domain.repository.ApiRepository
+import info.igorek.currencyexchanger.domain.repository.ApiRepositoryImpl
+import info.igorek.currencyexchanger.domain.repository.DatabaseRepository
+import info.igorek.currencyexchanger.domain.repository.DatabaseRepositoryImpl
+import info.igorek.currencyexchanger.domain.repository.PreferencesRepository
+import info.igorek.currencyexchanger.domain.repository.PreferencesRepositoryImpl
 import javax.inject.Singleton
 
 @Module

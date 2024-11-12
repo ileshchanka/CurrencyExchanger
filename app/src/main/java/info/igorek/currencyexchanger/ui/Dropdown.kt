@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger
+package info.igorek.currencyexchanger.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,7 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.R
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
 
 @Composable
 fun Dropdown(

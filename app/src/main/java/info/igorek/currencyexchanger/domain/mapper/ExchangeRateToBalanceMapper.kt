@@ -1,7 +1,7 @@
-package info.igorek.currencyexchanger.mapper
+package info.igorek.currencyexchanger.domain.mapper
 
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
-import info.igorek.currencyexchanger.model.ExchangeRate
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.domain.model.ExchangeRate
 import javax.inject.Inject
 
 class ExchangeRateToBalanceMapper @Inject constructor() {

@@ -1,13 +1,13 @@
-package info.igorek.currencyexchanger
+package info.igorek.currencyexchanger.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
-import info.igorek.currencyexchanger.model.ExchangeRate
-import info.igorek.currencyexchanger.repository.ApiRepository
-import info.igorek.currencyexchanger.repository.DatabaseRepository
-import info.igorek.currencyexchanger.repository.PreferencesRepository
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.domain.model.ExchangeRate
+import info.igorek.currencyexchanger.domain.repository.ApiRepository
+import info.igorek.currencyexchanger.domain.repository.DatabaseRepository
+import info.igorek.currencyexchanger.domain.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

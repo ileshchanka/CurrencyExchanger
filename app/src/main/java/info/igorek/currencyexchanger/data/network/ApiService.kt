@@ -1,6 +1,6 @@
-package info.igorek.currencyexchanger.network
+package info.igorek.currencyexchanger.data.network
 
-import info.igorek.currencyexchanger.model.RatesResponse
+import info.igorek.currencyexchanger.domain.model.RatesResponse
 import retrofit2.http.GET
 
 interface ApiService {

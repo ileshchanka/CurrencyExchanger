@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger.model
+package info.igorek.currencyexchanger.domain.model
 
 import com.google.gson.annotations.SerializedName
 

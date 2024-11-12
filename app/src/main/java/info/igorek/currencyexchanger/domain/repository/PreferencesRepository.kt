@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger.repository
+package info.igorek.currencyexchanger.domain.repository
 
 import android.content.SharedPreferences
 import javax.inject.Inject

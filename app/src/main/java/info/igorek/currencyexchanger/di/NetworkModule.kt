@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import info.igorek.currencyexchanger.network.ApiService
+import info.igorek.currencyexchanger.data.network.ApiService
 import okhttp3.OkHttpClient
 import retrofit2.Converter
 import retrofit2.Retrofit

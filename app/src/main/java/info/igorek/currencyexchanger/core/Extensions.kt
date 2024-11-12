@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger
+package info.igorek.currencyexchanger.core
 
 import kotlin.math.pow
 

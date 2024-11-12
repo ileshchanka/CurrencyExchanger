@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger
+package info.igorek.currencyexchanger.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +26,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.R
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
 
 @Composable
 fun SellRow(

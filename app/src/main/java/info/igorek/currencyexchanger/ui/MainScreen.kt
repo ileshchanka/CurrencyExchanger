@@ -1,4 +1,4 @@
-package info.igorek.currencyexchanger
+package info.igorek.currencyexchanger.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -35,10 +35,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import info.igorek.currencyexchanger.MainViewModel.MainUiState
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
-import info.igorek.currencyexchanger.model.ExchangeRate
+import info.igorek.currencyexchanger.R
+import info.igorek.currencyexchanger.ui.MainViewModel.MainUiState
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.domain.model.ExchangeRate
 import info.igorek.currencyexchanger.ui.theme.HavelockBlue
+import info.igorek.currencyexchanger.core.BALANCE_SEPARATOR
+import info.igorek.currencyexchanger.core.COMMISSION_PERCENT
+import info.igorek.currencyexchanger.core.EMPTY_STRING
+import info.igorek.currencyexchanger.core.roundToDecimals
 import java.util.Locale
 
 @Composable

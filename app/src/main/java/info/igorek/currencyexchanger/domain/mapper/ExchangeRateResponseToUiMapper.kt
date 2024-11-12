@@ -1,7 +1,7 @@
-package info.igorek.currencyexchanger.mapper
+package info.igorek.currencyexchanger.domain.mapper
 
-import info.igorek.currencyexchanger.model.ExchangeRate
-import info.igorek.currencyexchanger.model.RatesResponse
+import info.igorek.currencyexchanger.domain.model.ExchangeRate
+import info.igorek.currencyexchanger.domain.model.RatesResponse
 import javax.inject.Inject
 
 class ExchangeRateResponseToUiMapper @Inject constructor() {

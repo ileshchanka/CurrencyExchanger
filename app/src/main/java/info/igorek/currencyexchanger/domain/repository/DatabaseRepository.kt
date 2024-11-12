@@ -1,7 +1,7 @@
-package info.igorek.currencyexchanger.repository
+package info.igorek.currencyexchanger.domain.repository
 
-import info.igorek.currencyexchanger.db.CurrencyBalanceEntity
-import info.igorek.currencyexchanger.db.RatesDao
+import info.igorek.currencyexchanger.data.db.CurrencyBalanceEntity
+import info.igorek.currencyexchanger.data.db.RatesDao
 import javax.inject.Inject
 
 interface DatabaseRepository {
