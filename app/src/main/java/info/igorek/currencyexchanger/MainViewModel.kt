@@ -9,6 +9,7 @@ import info.igorek.currencyexchanger.repository.ApiRepository
 import info.igorek.currencyexchanger.repository.DatabaseRepository
 import info.igorek.currencyexchanger.repository.PreferencesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -31,18 +32,8 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        getCurrencies()
+        startCurrencySync()
         getBalances()
-    }
-
-    private fun getCurrencies() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _mainUiState.update {
-                it.copy(
-                    rates = apiRepository.getCurrencies()
-                )
-            }
-        }
     }
 
     private fun getBalances() {
@@ -51,6 +42,22 @@ class MainViewModel @Inject constructor(
                 it.copy(
                     balances = databaseRepository.getBalances()
                 )
+            }
+        }
+    }
+
+    private fun startCurrencySync() {
+        viewModelScope.launch {
+            while (true) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _mainUiState.update {
+                        it.copy(
+                            rates = apiRepository.getCurrencies()
+                        )
+                    }
+                    getBalances()
+                }
+                delay(5000L) // 5 seconds delay
             }
         }
     }
@@ -68,6 +75,8 @@ class MainViewModel @Inject constructor(
                 saveExchangeCount(exchangeCount + 1)
             }
             onComplete(result)
+
+            getExchangeCount()
         }
     }
 

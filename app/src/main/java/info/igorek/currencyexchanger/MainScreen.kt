@@ -1,5 +1,6 @@
 package info.igorek.currencyexchanger
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -80,6 +81,8 @@ fun MainScreen(
         }
     }
 
+    Log.d("IH@R", "MainScreen: hasCommission = $hasCommission, receiveAmount = $receiveAmount")
+
     val isCurrenciesDifferent by remember { derivedStateOf { sellCurrency.code != receiveCurrency.code } }
 
     val isAmountNotEmpty by remember { derivedStateOf { sellAmount > 0.0 } }
@@ -102,7 +105,7 @@ fun MainScreen(
             viewModel.updateBalances(
                 fromCode = sellCurrency.code,
                 toCode = receiveCurrency.code,
-                sellAmount = sellAmount + commission,
+                sellAmount = if (hasCommission) sellAmount + commission else sellAmount,
                 receiveAmount = receiveAmount.toDouble(),
                 onComplete = onComplete,
             )
@@ -160,6 +163,7 @@ fun MainScreen(
                 Column {
                     Text(
                         text = stringResource(R.string.my_balances),
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(16.dp),
                     )
 
@@ -171,13 +175,14 @@ fun MainScreen(
                         Text(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             text = mainUiState.balances.joinToString(separator = BALANCE_SEPARATOR) {
-                                "${it.balance} ${it.code}"
+                                "${it.balance.roundToDecimals(2)} ${it.code}"
                             }
                         )
                     }
 
                     Text(
                         text = stringResource(R.string.currency_exchange),
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(16.dp),
                     )
 
@@ -192,7 +197,11 @@ fun MainScreen(
                         isAmountEnoughBalance = isAmountEnoughBalance,
                     )
 
-                    HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                    HorizontalDivider(
+                        color = Color.Gray,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
 
                     ReceiveRow(
                         text = receiveAmount,

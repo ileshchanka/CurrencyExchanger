@@ -1,11 +1,10 @@
 package info.igorek.currencyexchanger
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
@@ -27,39 +26,44 @@ fun ReceiveRow(
     onCurrencyChange: (CurrencyBalanceEntity) -> Unit,
 ) {
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowDown,
-            contentDescription = null,
-            tint = Color.Green,
-            modifier = Modifier.size(24.dp)
-        )
+    Column {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = Color.Green,
+                modifier = Modifier.size(24.dp)
+            )
 
-        Text(
-            modifier = Modifier.weight(1f),
-            text = stringResource(R.string.receive),
-        )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = stringResource(R.string.receive),
+            )
+        }
 
-        Text(
-            text = text,
-            color = Color.Green,
-            modifier = Modifier.width(150.dp), // TODO Find a better way to set width
-        )
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = text,
+                color = Color.Green,
+                modifier = Modifier.weight(1f),
+            )
 
-        Spacer(modifier = Modifier.width(4.dp))
-
-        Dropdown(
-            modifier = Modifier,
-            currencyList = currencyList,
-            onCurrencyChange = onCurrencyChange,
-        )
+            Dropdown(
+                currencyList = currencyList,
+                onCurrencyChange = onCurrencyChange,
+            )
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

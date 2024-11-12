@@ -2,16 +2,14 @@ package info.igorek.currencyexchanger
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -47,7 +45,7 @@ fun SellRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
@@ -55,14 +53,20 @@ fun SellRow(
                 imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = null,
                 tint = Color.Red,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
 
             Text(
                 modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge,
                 text = stringResource(R.string.sell),
             )
+        }
 
+        Row(
+            modifier = Modifier.padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             TextField(
                 value = textState,
                 onValueChange = { newValue ->
@@ -78,15 +82,10 @@ fun SellRow(
                     unfocusedIndicatorColor = Color.Transparent,
                     focusedTextColor = if (isAmountEnoughBalance) Color.Black else Color.Red,
                 ),
-                modifier = Modifier
-                    .padding(0.dp)
-                    .width(150.dp), // TODO Find a better way to set width
+                modifier = Modifier.weight(1f),
             )
 
-            Spacer(modifier = Modifier.width(4.dp))
-
             Dropdown(
-                modifier = Modifier,
                 currencyList = currencyList,
                 onCurrencyChange = {
                     onCurrencyChange(it)
@@ -94,16 +93,20 @@ fun SellRow(
             )
         }
 
-        Row {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+        ) {
             if (hasCommission) {
                 Text(
                     text = stringResource(R.string.commission, commission, currencyCode),
+                    modifier = Modifier.fillMaxWidth(),
                     color = Color.Red,
                 )
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
